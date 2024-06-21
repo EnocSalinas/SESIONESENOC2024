@@ -2,6 +2,8 @@
 #include <string.h>
 #include "variables.h"
 #include <locale.h>
+#include <fstream>
+#include <stdlib.h>
 
 using namespace std;
 
@@ -22,6 +24,8 @@ void showData(CIUDAD &c);
 void buscarxID();
 void editarDatos();
 void eliminarDato();
+int loadCity();
+void writeFile(const CIUDAD &city);
 
 void agregar(CIUDAD *c)
 {
@@ -82,13 +86,14 @@ int menu()
     cout << "4. Buscar \n";
     cout << "5. Mostrar Todo\n";
     cout << "6. Salir\n ";
-    cout << "Digite la opción ";
+    cout << "Digite la opcion ";
     cin >> op;
     return op;
 }
 
 void principal()
 {
+    pos = loadCity();
     int op;
     do
     {
@@ -133,6 +138,8 @@ void pedirDatos()
     scanf(" %[^\n]", ciudad.descripcion);
     agregar(&ciudad);
     cout << "Registro Agregado....\n";
+    
+    writeFile(ciudad);
 }
 
 void mostrarDatos()
@@ -168,7 +175,7 @@ void editarDatos(){
      CIUDAD c = buscar(id);
      cout << "Nombre: ";
      scanf(" %[^\n]", c.nombre);
-     cout << "Descripción: " ;
+     cout << "Descripcion: " ;
      scanf(" %[^\n]", c.descripcion);
      editar(&c, id);
      cout << "Registro actualizado...\n";
@@ -180,4 +187,34 @@ void eliminarDato(){
     cout << "ID: ";
     cin >> id;
     eliminar(id);
+}
+
+int loadCity(){
+    ifstream archivo("cities.txt");
+    if(archivo.fail())
+        return 0;
+    int i = 0;
+    while(archivo >> ciudades[i].id){
+        archivo.ignore();
+        archivo.getline(ciudades[i].nombre, 50);
+        archivo.getline(ciudades[i].descripcion, 100);
+        i++;
+    }
+    archivo.close();
+    return i;
+}
+void writeFile(const CIUDAD &city){
+    ofstream archivo;
+
+    archivo.open("cities.txt", ios::app);
+    if (archivo.fail())
+    {
+        cout << "No se pudo abrir el archivo\n";
+        exit(1);
+    }
+    archivo << city.id << endl;
+    archivo << city.nombre << endl;
+    archivo << city.descripcion << endl;
+    archivo.close();
+
 }

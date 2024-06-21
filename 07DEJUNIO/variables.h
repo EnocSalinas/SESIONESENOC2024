@@ -1,4 +1,3 @@
-
 #define MAX_REG 100
 
 typedef struct CIUDAD{
